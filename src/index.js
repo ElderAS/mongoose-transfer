@@ -25,7 +25,7 @@ module.exports = function transferPlugin(schema, options) {
               items.map(
                 item =>
                   new Promise((resolve, reject) => {
-                    key.forEach(value => SetByKey(value.split('.'), item, transferID, val => val.equals(this._id)))
+                    key.forEach(value => SetByKey(value.split('.'), item, this._id, transferID))
                     item.save(err => {
                       if (err) {
                         if (options.debug) log(chalk`{bold.red Error at transfer:} ${model} ${item.id}`)
@@ -44,17 +44,19 @@ module.exports = function transferPlugin(schema, options) {
   }
 }
 
-function SetByKey(path, obj, result, condition) {
+function SetByKey(path, obj, from, to) {
   if (path instanceof Array === false) return console.error('path must be an array')
+
   let pathClone = path.slice(0)
-  let cPath = pathClone.shift()
+  let key = pathClone.shift()
+  let value = obj[key]
+  let isArray = value instanceof Array
+
   if (pathClone.length) {
-    let value = obj[cPath]
-    if (value instanceof Array) value.forEach(val => SetByKey(pathClone, val, result, condition))
-    else SetByKey(pathClone, value, result, condition)
-  } else {
-    let execute = true
-    if (condition) execute = condition(obj[cPath])
-    if (execute) obj[cPath] = result
+    if (isArray) return value.forEach(val => SetByKey(pathClone, val, from, to))
+    return SetByKey(pathClone, value, from, to)
   }
+
+  if (isArray) return (obj[key] = value.map(entry => (entry.equals(from) ? to : entry)))
+  if (value.equals(from)) return (obj[key] = to)
 }
