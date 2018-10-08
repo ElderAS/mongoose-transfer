@@ -1,6 +1,6 @@
 # mongoose-transfer
 
-[![Build Status](https://travis-ci.org/crsten/mongoose-transfer.svg?branch=master&style=flat-square)](https://travis-ci.org/crsten/mongoose-transfer)
+[![Build Status](https://travis-ci.org/ElderAS/mongoose-transfer.svg?branch=master&style=flat-square)](https://travis-ci.org/ElderAS/mongoose-transfer)
 [![npm](https://img.shields.io/npm/dt/mongoose-transfer.svg?style=flat-square)](https://www.npmjs.com/package/mongoose-transfer)
 [![npm](https://img.shields.io/npm/v/mongoose-transfer.svg?style=flat-square)](https://www.npmjs.com/package/mongoose-transfer)
 
