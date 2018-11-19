@@ -57,6 +57,9 @@ function SetByKey(path, obj, from, to) {
     return SetByKey(pathClone, value, from, to)
   }
 
-  if (isArray) return (obj[key] = value.map(entry => (entry.equals(from) ? to : entry)))
+  if (isArray) {
+    if (value.find(e => e.equals(to))) return (obj[key] = value.filter(entry => !entry.equals(from)))
+    return (obj[key] = value.map(entry => (entry.equals(from) ? to : entry)))
+  }
   if (value.equals(from)) return (obj[key] = to)
 }
