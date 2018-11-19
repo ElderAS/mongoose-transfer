@@ -45,21 +45,28 @@ This plugin adds a method `.transfer` to the schema. Call `.transfer` to run a r
 
 This function takes 2 parameters:
 
-- ID -> the ID which matching documents should be transfered to
-- Options (Object)
-  - doc -> the document which is beeing transfered
-  - model -> the model of the document which is beeing transfered
+| Parameter no. | Type     | Description                                               |
+| ------------- | -------- | --------------------------------------------------------- |
+| 1             | ObjectId | ObjectId which matching documents should be transfered to |
+| 2             | Object   | Options (see info below)                                  |
+
+**Options**
+
+```js
+{
+  condition: { company: '...' } // Object that extends the mongoose query
+  //OR
+  condition: function(doc, model) { // Function that runs for each affected document
+    return doc.company === '...'
+  }
+}
+```
 
 **Example**
 
 ```js
 user.transfer('NEWID', {
-  //(OPTIONAL)
-  condition: { company: '...' } // Object that extends the mongoose query -> same style as query object in mongoose
-  //OR
-  condition: function(doc, model) { // Function which takes each document entry as a parameter and returns true or false (Promise is allowed)
-    return doc.company === '...'
-  }
+  condition: { company: '...' },
 })
 ```
 
@@ -76,9 +83,9 @@ relations is an `Array` and takes `Objects` like this:
   model: 'SomeModel', //Name of the model that has a reference to this model
   key: 'reference' //Name of the key that holds the relation. You can send an array aswell
   //(OPTIONAL)
-  condition: { company: '...' } // Object that extends the mongoose query -> same style as query object in mongoose
+  condition: { company: '...' } // Object that extends the mongoose query
   //OR
-  condition: function(doc, model) { // Function which takes each document entry as a parameter and returns true or false (Promise is allowed)
+  condition: function(doc, model) { // Function that runs for each affected document
     return doc.company === '...'
   }
 }
