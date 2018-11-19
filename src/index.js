@@ -11,9 +11,11 @@ module.exports = function transferPlugin(schema, options) {
 
   if (!relations.length) return
 
-  schema.methods.transfer = function(transferID) {
+  schema.methods.transfer = function(transferID, transferOptions = {}) {
     return Promise.all(
-      relations.map(({ model, key, condition }) => {
+      relations.map(relation => {
+        let { model, key } = relation
+        let condition = transferOptions.condition || relation.condition
         let query = {}
         key = key instanceof Array ? key : [key]
         query.$or = key.map(value => ({ [value]: this._id }))
@@ -28,7 +30,7 @@ module.exports = function transferPlugin(schema, options) {
               items.map(
                 item =>
                   new Promise((resolve, reject) => {
-                    Promise.resolve(condition(item))
+                    Promise.resolve(condition(item, model))
                       .then(result => (result ? resolve(item) : resolve(null)))
                       .catch(reject)
                   }),

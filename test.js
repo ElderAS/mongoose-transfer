@@ -60,7 +60,11 @@
   let [john, jane, hp1, hp2] = await Promise.all(allEntries.map(e => e.save()))
 
   /* Execute tests */
-  await john.transfer(jane._id)
+  await john.transfer(jane._id, {
+    condition: (doc, model) => {
+      return doc.name === 'Harry Potter 2'
+    },
+  })
 
   /* Exit */
   console.log('Everything has run!')

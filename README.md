@@ -31,13 +31,39 @@ YourSchema.plugin(mongooseTransfer, {
 let Model = mongoose.model('YourSchema', YourSchema)
 ```
 
-After setting up all relations, you can call `.transfer(NEWID)` on your documents which will transfer all related documents to a new entity.
+After setting up all relations, you can call `.transfer(NEWID, OPTIONS)` on your documents which will transfer all related documents to a new entity.
 
 ```js
-document.transfer(NEWID)
+document.transfer(NEWID, OPTIONS)
 ```
 
-### Options
+### Methods
+
+#### transfer
+
+This plugin adds a method `.transfer` to the schema. Call `.transfer` to run a reference transfer
+
+This function takes 2 parameters:
+
+- ID -> the ID which matching documents should be transfered to
+- Options (Object)
+  - doc -> the document which is beeing transfered
+  - model -> the model of the document which is beeing transfered
+
+**Example**
+
+```js
+user.transfer('NEWID', {
+  //(OPTIONAL)
+  condition: { company: '...' } // Object that extends the mongoose query -> same style as query object in mongoose
+  //OR
+  condition: function(doc, model) { // Function which takes each document entry as a parameter and returns true or false (Promise is allowed)
+    return doc.company === '...'
+  }
+})
+```
+
+### Options (Plugin)
 
 #### relations
 
@@ -52,7 +78,7 @@ relations is an `Array` and takes `Objects` like this:
   //(OPTIONAL)
   condition: { company: '...' } // Object that extends the mongoose query -> same style as query object in mongoose
   //OR
-  condition: function(doc) { // Function which takes each document entry as a parameter and returns true or false (Promise is allowed)
+  condition: function(doc, model) { // Function which takes each document entry as a parameter and returns true or false (Promise is allowed)
     return doc.company === '...'
   }
 }
