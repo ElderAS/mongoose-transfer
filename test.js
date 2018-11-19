@@ -15,7 +15,13 @@
     name: String,
   })
   UserSchema.plugin(Plugin, {
-    relations: [{ model: 'Book', key: ['author', 'likes', 'createdBy'] }],
+    relations: [
+      {
+        model: 'Book',
+        key: ['author', 'likes', 'createdBy'],
+        condition: doc => doc.name === 'Harry Potter 1',
+      },
+    ],
     debug: true,
   })
 

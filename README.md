@@ -24,7 +24,7 @@ let YourSchema = new Schema({
 })
 
 YourSchema.plugin(mongooseTransfer, {
-  relations: [{ model: 'SomeOtherModel', key: 'author' }],
+  relations: [{ model: 'SomeOtherModel', key: 'author', condition: { company: '...' } }],
   debug: true, // Default: false -> If true operations are logged out in your console
 })
 
@@ -49,6 +49,12 @@ relations is an `Array` and takes `Objects` like this:
 {
   model: 'SomeModel', //Name of the model that has a reference to this model
   key: 'reference' //Name of the key that holds the relation. You can send an array aswell
+  //(OPTIONAL)
+  condition: { company: '...' } // Object that extends the mongoose query -> same style as query object in mongoose
+  //OR
+  condition: function(doc) { // Function which takes each document entry as a parameter and returns true or false (Promise is allowed)
+    return doc.company === '...'
+  }
 }
 ```
 

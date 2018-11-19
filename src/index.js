@@ -13,13 +13,28 @@ module.exports = function transferPlugin(schema, options) {
 
   schema.methods.transfer = function(transferID) {
     return Promise.all(
-      relations.map(({ model, key }) => {
+      relations.map(({ model, key, condition }) => {
         let query = {}
         key = key instanceof Array ? key : [key]
         query.$or = key.map(value => ({ [value]: this._id }))
+        if (condition && typeof condition !== 'function') Object.assign(query, condition)
 
         return this.model(model)
           .find(query)
+          .then(items => {
+            if (!condition || typeof condition !== 'function') return items
+
+            return Promise.all(
+              items.map(
+                item =>
+                  new Promise((resolve, reject) => {
+                    Promise.resolve(condition(item))
+                      .then(result => (result ? resolve(item) : resolve(null)))
+                      .catch(reject)
+                  }),
+              ),
+            ).then(res => res.filter(Boolean))
+          })
           .then(items =>
             Promise.all(
               items.map(
