@@ -16,7 +16,7 @@ module.exports = function transferPlugin(schema, options) {
       relations.map(({ model, key }) => {
         let query = {}
         key = key instanceof Array ? key : [key]
-        key.forEach(value => (query[value] = this._id))
+        query.$or = key.map(value => ({ [value]: this._id }))
 
         return this.model(model)
           .find(query)
