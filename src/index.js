@@ -78,5 +78,5 @@ function SetByKey(path, obj, from, to) {
     if (value.find(e => e.equals(to))) return (obj[key] = value.filter(entry => !entry.equals(from)))
     return (obj[key] = value.map(entry => (entry.equals(from) ? to : entry)))
   }
-  if (value.equals(from)) return (obj[key] = to)
+  if (value && value.equals && value.equals(from)) return (obj[key] = to)
 }
