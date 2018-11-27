@@ -12,6 +12,8 @@ module.exports = function transferPlugin(schema, options) {
   if (!relations.length) return
 
   schema.methods.transfer = function(transferID, transferOptions = {}) {
+    if (this._id.equals(transferID)) return Promise.reject(new Error('Cannot transfer to self'))
+
     return Promise.all(
       relations.map(relation => {
         let { model, key } = relation
