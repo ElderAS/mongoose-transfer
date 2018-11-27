@@ -2,6 +2,8 @@ const mongoose = require('mongoose')
 const Mockgoose = require('mockgoose').Mockgoose
 const mockgoose = new Mockgoose(mongoose)
 
+jest.setTimeout(30000)
+
 beforeAll(() => {
   return mockgoose.prepareStorage().then(() => {
     return new Promise((resolve, reject) => {
