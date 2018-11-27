@@ -141,16 +141,16 @@ describe('Transfer (options)', () => {
     let hp2 = books.find(b => b.name === 'Harry Potter 2')
     let article = await ArticleModel.findOne()
 
-    expect(hp1.author.toString()).toBe(john._id.toString())
+    expect(hp1.author.toString()).toBe(jane._id.toString())
+    expect(hp2.author.toString()).toBe(jane._id.toString())
     expect(hp1.createdBy).toBeFalsy()
+    expect(hp2.createdBy.toString()).toBe(jane._id.toString())
 
     expect(article.author.toString()).toBe(john._id.toString())
     expect(article.createdBy.toString()).toBe(john._id.toString())
 
-    expect(hp2.likes[0].toString()).toBe(jane._id.toString())
-
     expect(hp1.likes).toHaveLength(2)
     expect(article.likes).toHaveLength(2)
-    expect(hp2.likes).toHaveLength(1)
+    expect(hp2.likes).toHaveLength(2)
   })
 })

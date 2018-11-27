@@ -30,7 +30,12 @@ module.exports = function transferPlugin(schema, options) {
 
         let query = {}
         key = key instanceof Array ? key : [key]
-        query.$or = key.map(value => ({ [value]: this._id }))
+        key = key.map(item => {
+          if (typeof item === 'string') return { key: item, options: {} }
+          return item
+        })
+
+        query.$or = key.map(value => ({ [value.key]: this._id }))
         if (condition && typeof condition !== 'function') Object.assign(query, condition)
 
         return this.model(model)
@@ -54,7 +59,7 @@ module.exports = function transferPlugin(schema, options) {
               items.map(
                 item =>
                   new Promise((resolve, reject) => {
-                    key.forEach(value => SetByKey(value.split('.'), item, this._id, transferID))
+                    key.forEach(value => SetByKey(value.key.split('.'), item, this._id, transferID, value.options))
                     item.save(err => {
                       if (err) {
                         if (options.debug) log(chalk`{bold.red Error at transfer:} ${model} ${item.id}`)
@@ -73,7 +78,7 @@ module.exports = function transferPlugin(schema, options) {
   }
 }
 
-function SetByKey(path, obj, from, to) {
+function SetByKey(path, obj, from, to, options = {}) {
   if (path instanceof Array === false) return console.error('path must be an array')
 
   let pathClone = path.slice(0)
@@ -82,13 +87,19 @@ function SetByKey(path, obj, from, to) {
   let isArray = value instanceof Array
 
   if (pathClone.length) {
-    if (isArray) return value.forEach(val => SetByKey(pathClone, val, from, to))
-    return SetByKey(pathClone, value, from, to)
+    if (isArray) return value.forEach(val => SetByKey(pathClone, val, from, to, options))
+    return SetByKey(pathClone, value, from, to, options)
   }
 
   if (isArray) {
-    if (value.find(e => e.equals(to))) return (obj[key] = value.filter(entry => !entry.equals(from)))
+    let hasMatchingTo = value.find(e => e.equals(to))
+    if (hasMatchingTo) options.remove = true
+
+    if (options.remove) return (obj[key] = value.filter(entry => !entry.equals(from)))
     return (obj[key] = value.map(entry => (entry.equals(from) ? to : entry)))
   }
-  if (value && value.equals && value.equals(from)) return (obj[key] = to)
+  if (value && value.equals && value.equals(from)) {
+    if (options.remove) return (obj[key] = null)
+    else return (obj[key] = to)
+  }
 }
