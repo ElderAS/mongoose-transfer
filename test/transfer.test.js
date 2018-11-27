@@ -1,59 +1,41 @@
 const mongoose = require('mongoose')
-const Mockgoose = require('mockgoose').Mockgoose
-
-const mockgoose = new Mockgoose(mongoose)
 const Plugin = require('../src')
 let UserModel, BookModel, ArticleModel
 
-function connectDB() {
-  return mockgoose.prepareStorage().then(() => {
-    return new Promise((resolve, reject) => {
-      mongoose.connect(
-        'mongodb://localhost:27017/mongoose-transfer-test',
-        { useNewUrlParser: true },
-        err => (err ? reject(err) : resolve()),
-      )
-    })
-  })
-}
-
 beforeAll(() => {
-  return connectDB().then(() => {
-    /* Setup sample schemas */
-    const UserSchema = new mongoose.Schema({
-      name: String,
-    })
-    UserSchema.plugin(Plugin, {
-      relations: [
-        {
-          model: 'Book',
-          key: ['author', 'likes', 'createdBy'],
-        },
-        {
-          model: 'Article',
-          key: ['author', 'likes', 'createdBy'],
-        },
-      ],
-    })
-
-    const BookSchema = new mongoose.Schema({
-      name: String,
-      author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-      likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-      createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    })
-
-    const ArticleSchema = new mongoose.Schema({
-      name: String,
-      author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-      likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-      createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    })
-
-    UserModel = mongoose.model('User', UserSchema)
-    BookModel = mongoose.model('Book', BookSchema)
-    ArticleModel = mongoose.model('Article', ArticleSchema)
+  const UserSchema = new mongoose.Schema({
+    name: String,
   })
+  UserSchema.plugin(Plugin, {
+    relations: [
+      {
+        model: 'Book',
+        key: ['author', 'likes', 'createdBy'],
+      },
+      {
+        model: 'Article',
+        key: ['author', 'likes', 'createdBy'],
+      },
+    ],
+  })
+
+  const BookSchema = new mongoose.Schema({
+    name: String,
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  })
+
+  const ArticleSchema = new mongoose.Schema({
+    name: String,
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  })
+
+  UserModel = mongoose.model('User', UserSchema)
+  BookModel = mongoose.model('Book', BookSchema)
+  ArticleModel = mongoose.model('Article', ArticleSchema)
 })
 
 beforeEach(() => {
@@ -83,11 +65,6 @@ beforeEach(() => {
   ]
   let allEntries = [...users, ...books, ...articles]
   return Promise.all(allEntries.map(e => e.save()))
-})
-
-afterEach(() => {
-  /* Cleanup DB */
-  return Promise.all([UserModel.deleteMany({}), BookModel.deleteMany({}), ArticleModel.deleteMany({})])
 })
 
 describe('Transfer', () => {

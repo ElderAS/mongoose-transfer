@@ -1,21 +1,6 @@
 const mongoose = require('mongoose')
-const Mockgoose = require('mockgoose').Mockgoose
-
-const mockgoose = new Mockgoose(mongoose)
 const Plugin = require('../src')
 let UserModel, BookModel
-
-function connectDB() {
-  return mockgoose.prepareStorage().then(() => {
-    return new Promise((resolve, reject) => {
-      mongoose.connect(
-        'mongodb://localhost:27017/mongoose-transfer-test',
-        { useNewUrlParser: true },
-        err => (err ? reject(err) : resolve()),
-      )
-    })
-  })
-}
 
 function setupSchema(condition) {
   const UserSchema = new mongoose.Schema({
@@ -62,15 +47,6 @@ function mockData() {
   let allEntries = [...users, ...books]
   return Promise.all(allEntries.map(e => e.save()))
 }
-
-beforeAll(() => {
-  return connectDB()
-})
-
-afterEach(() => {
-  /* Cleanup DB */
-  return Promise.all([UserModel.deleteMany({}), BookModel.deleteMany({})])
-})
 
 describe('Plugin', () => {
   test('All references are transfered with condition(query)', async () => {
