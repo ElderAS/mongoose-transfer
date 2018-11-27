@@ -17,7 +17,7 @@ function connectDB() {
   })
 }
 
-global.beforeAll(() => {
+beforeAll(() => {
   return connectDB().then(() => {
     /* Setup sample schemas */
     const UserSchema = new mongoose.Schema({
@@ -56,7 +56,7 @@ global.beforeAll(() => {
   })
 })
 
-global.beforeEach(() => {
+beforeEach(() => {
   let users = [new UserModel({ name: 'John Doe' }), new UserModel({ name: 'Jane Doe' })]
   let [john_draft, jane_draft] = users
   let books = [
@@ -85,7 +85,7 @@ global.beforeEach(() => {
   return Promise.all(allEntries.map(e => e.save()))
 })
 
-global.afterEach(() => {
+afterEach(() => {
   /* Cleanup DB */
   return Promise.all([UserModel.deleteMany({}), BookModel.deleteMany({}), ArticleModel.deleteMany({})])
 })
@@ -98,7 +98,7 @@ describe('Transfer (options)', () => {
     await john.transfer(jane._id, {
       relations: [
         {
-          model: 'BookModel',
+          model: 'Book',
           key: ['author'],
         },
       ],
@@ -130,7 +130,7 @@ describe('Transfer (options)', () => {
     await john.transfer(jane._id, {
       relations: [
         {
-          model: 'BookModel',
+          model: 'Book',
           key: ['author', { key: 'createdBy', options: { remove: true } }],
         },
       ],

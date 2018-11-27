@@ -7,17 +7,27 @@ function log(msg) {
 
 module.exports = function transferPlugin(schema, options) {
   if (!options || !options.relations) return log(chalk`{bold.red Error at init:} options.relations is required`)
-  const { relations } = options
 
-  if (!relations.length) return
+  if (!options.relations.length) return
 
   schema.methods.transfer = function(transferID, transferOptions = {}) {
     if (this._id.equals(transferID)) return Promise.reject(new Error('Cannot transfer to self'))
-
+    let mergedOptions = Object.assign({}, options, transferOptions)
+    let relationSource = transferOptions.relations ? 'transfer' : 'plugin'
     return Promise.all(
-      relations.map(relation => {
+      mergedOptions.relations.map(relation => {
         let { model, key } = relation
-        let condition = transferOptions.condition || relation.condition
+        let condition
+
+        switch (relationSource) {
+          case 'transfer':
+            condition = relation.condition || mergedOptions.condition
+            break
+          case 'plugin':
+            condition = transferOptions.condition || relation.condition || mergedOptions.condition
+            break
+        }
+
         let query = {}
         key = key instanceof Array ? key : [key]
         query.$or = key.map(value => ({ [value]: this._id }))

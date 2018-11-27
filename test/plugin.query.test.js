@@ -63,11 +63,11 @@ function mockData() {
   return Promise.all(allEntries.map(e => e.save()))
 }
 
-global.beforeAll(() => {
+beforeAll(() => {
   return connectDB()
 })
 
-global.afterEach(() => {
+afterEach(() => {
   /* Cleanup DB */
   return Promise.all([UserModel.deleteMany({}), BookModel.deleteMany({})])
 })
