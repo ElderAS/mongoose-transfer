@@ -4,7 +4,7 @@
   "description": "mongoose plugin to simplify the reference transfer in case of deletion",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"No tests yet\"",
+    "test": "jest --runInBand",
     "travis-deploy-once": "travis-deploy-once",
     "semantic-release": "semantic-release"
   },
@@ -30,6 +30,9 @@
   },
   "devDependencies": {
     "cz-conventional-changelog": "^2.1.0",
+    "husky": "^1.2.0",
+    "jest": "^23.6.0",
+    "mockgoose": "^7.3.5",
     "semantic-release": "^15.9.17",
     "travis-deploy-once": "^5.0.9"
   },
