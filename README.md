@@ -50,18 +50,6 @@ This function takes 2 parameters:
 | 1             | ObjectId | ObjectId which matching documents should be transfered to |
 | 2             | Object   | Options (see info below)                                  |
 
-**Options**
-
-```js
-{
-  condition: { company: '...' } // Object that extends the mongoose query
-  //OR
-  condition: function(doc, model) { // Function that runs for each affected document
-    return doc.company === '...'
-  }
-}
-```
-
 **Example**
 
 ```js
@@ -70,31 +58,88 @@ user.transfer('NEWID', {
 })
 ```
 
-### Options (Plugin)
+### Options
+
+#### condition
+
+Define under which conditions transfer can take place.
+Accepts an object (mongoose query) or a function executed on each document
+
+```js
+{
+  condition: { "name": { $ne: "Mark" } }
+}
+```
+
+```js
+{
+  condition: function(doc, model) {
+    console.log(model) // -> e.g. "User"
+    return doc.name !== 'Mark'
+  }
+}
+```
 
 #### relations
 
 Define all relations this model has to other models.
-
 relations is an `Array` and takes `Objects` like this:
+
+| Prop        | Type                | Description                                                           |
+| ----------- | ------------------- | --------------------------------------------------------------------- |
+| `model`     | String              | Name of the registered mongoose model                                 |
+| `condition` | See condition above | Overrides the condition on document level                             |
+| `key`       | String/Object/Array | Define which props that contain references. See `relations.key` below |
+
+**Examples**
 
 ```js
 {
-  model: 'SomeModel', //Name of the model that has a reference to this model
-  key: 'reference' //Name of the key that holds the relation. You can send an array aswell
-  //(OPTIONAL)
-  condition: { company: '...' } // Object that extends the mongoose query
-  //OR
-  condition: function(doc, model) { // Function that runs for each affected document
+  model: 'SomeModel',
+  key: 'reference',
+  condition: { company: '...' }
+}
+```
+
+```js
+{
+  model: 'SomeModel',
+  key: ['something.nested', { key: 'reference', options: { remove: true } }]
+  condition: function(doc, model) {
     return doc.company === '...'
   }
 }
 ```
 
+#### relations.key
+
+Define where the reference is located inside the document. Allows dotnotation ("some.deep.key").
+
+`relations.key` can be an `Array` for multiple references inside one document or `String/Object` for single references inside one document.
+
+Key can be defined in the following ways:
+
+| Type   | Example                                    | Description                              |
+| ------ | ------------------------------------------ | ---------------------------------------- |
+| String | `some.deep.key`                            | Simpel string selector (dotnotation)     |
+| Object | `{ key: "some.deep.key", options: {...} }` | Defining it as objects allow for options |
+
+**Key options**
+
+Keys allow the following options:
+
+| Prop   | Type      | Description                                                           |
+| ------ | --------- | --------------------------------------------------------------------- |
+| remove | `Boolean` | Set to true if you want to remove the relation instead of transfering |
+
 ```js
-YourSchema.plugin(mongooseTransfer, {
-  relations: [{ model: 'SomeOtherModel', key: 'author' }, { model: 'RandomModel', key: 'user' }],
-})
+{
+  model: 'SomeModel',
+  key: [
+    'something.nested',
+    { key: 'reference', options: { remove: true } }
+  ]
+}
 ```
 
 #### debug
